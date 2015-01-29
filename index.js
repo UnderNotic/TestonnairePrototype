@@ -12,16 +12,20 @@ var app = express();
 // Import the Anagrammatix game file.
 var game = require('./game');
 
-app.configure(function() {
-    // Turn down the logging activity
-    app.use(express.logger('dev'));
 
-    // Serve static html, js, css, and image files from the 'public' directory
-    app.use(express.static(path.join(__dirname,'public')));
+// all environments
+app.use(express.static(path.join(__dirname, 'public')));
+app.set('port', process.env.PORT || 3000);
+
+
+
+
+// Create a Node.js based http server 
+var server = app.listen(app.get('port'), function(){
+  console.log('Express server listening on port ' + app.get('port'));
 });
 
-// Create a Node.js based http server on port 8080
-var server = require('http').createServer(app).listen(8080);
+
 
 // Create a Socket.IO server and attach it to the http server
 var io = require('socket.io').listen(server);
@@ -32,6 +36,6 @@ io.set('log level',1);
 
 // Listen for Socket.IO Connections. Once connected, start the game logic.
 io.sockets.on('connection', function (socket) {
-    //console.log('client connected');
+    console.log('client connected');
     game.initGame(io, socket);
 });
