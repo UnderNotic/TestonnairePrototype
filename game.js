@@ -88,7 +88,7 @@ function hostStartGame(gameId){   // logic that randomize questions, send given 
 
         console.log('Player ' + data.playerName + ' joining game: ' + data.gameId );
 
-        // Emit an event notifying the clients that the player has joined the room.
+        // Emit an event notifying everyone in room that the player has joined the room.
         io.sockets.in(data.gameId).emit('playerJoinedRoom', data);
 
     } else {
@@ -118,3 +118,76 @@ function playerAnswer(data) {
    *      GAME LOGIC       *
    *                       *
    ************************* */
+
+
+  //send a question to player
+   function sendQuestion(gameId){
+    var questionData = getQuestionData();
+    io.sockets.in(data.gameId).emit('newWordData', questionData);  //sending question 
+   }
+
+/**
+ * TODO : randomization of question(uniquness!), user can define number of answers
+ */
+   function getQuestionData(){  
+
+// Randomize the order of the available words.
+    // The first element in the randomized array will be displayed on the host screen.
+    // The second element will be hidden in a list of decoys as the correct answer
+
+    var i = 0;
+    var answers = shuffle(sampleQuestions[i].answer);
+
+    // Randomize the order of the decoy words and choose the first 3
+    var decoys = shuffle(sampleQuestions[i].decoys).slice(0,3);
+
+    // Pick a random spot in the decoy list to put the correct answer
+    var rnd = Math.floor(Math.random() * 4); //correct
+    decoys.splice(rnd, 0, answers[0]);   // TODO dynamic number of answers not only one
+
+    // Package the words into a single object.
+    var wordData = {
+        answer : answers, // Correct Answer
+        decoys : decoys      // Word list for player (decoys and answer)
+    };
+
+    return wordData;
+   }
+
+/*
+ * Javascript implementation of Fisher-Yates shuffle algorithm
+ * http://stackoverflow.com/questions/2450954/how-to-randomize-a-javascript-array
+ */
+function shuffle(array) {
+    var currentIndex = array.length;
+    var temporaryValue;
+    var randomIndex;
+
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+
+    return array;
+}
+
+
+
+
+
+   var sampleQuestions = [
+
+    {
+        question  : "What colour is red car?" ,
+        decoys : [ "trata, answer2, answer3" ],
+        answers : ["red"]
+    },
+   ];

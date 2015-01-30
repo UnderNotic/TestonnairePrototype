@@ -228,8 +228,8 @@ function shuffle(array) {
  */
 var wordPool = [
     {
-        "words"  : [ "sale","seal","ales","leas" ],
-        "decoys" : [ "lead","lamp","seed","eels","lean","cels","lyse","sloe","tels","self" ]
+        words  : [ "sale","seal","ales","leas" ],
+        decoys : [ "lead","lamp","seed","eels","lean","cels","lyse","sloe","tels","self" ]
     },
 
     {
