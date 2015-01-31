@@ -123,7 +123,9 @@ function playerAnswer(data) {
   //send a question to player
    function sendQuestion(gameId){
     var questionData = getQuestionData();
-    io.sockets.in(data.gameId).emit('newWordData', questionData);  //sending question 
+    //DELAY ??
+
+    io.sockets.in(data.gameId).emit('newQuestionData', questionData);  //sending question 
    }
 
 /**
