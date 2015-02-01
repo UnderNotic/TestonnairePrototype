@@ -15,7 +15,7 @@ var gameSocket;
 exports.initGame = function(sio, socket){
 	io = sio; 	//library
 	gameSocket = socket; 	//connected client socket
-	gameSocket.emit("connected", {message: "You are connected!"});
+	gameSocket.emit("connected", {message: "You are connected!"});  
 
 	// Host Events
     gameSocket.on('hostCreateNewGame', hostCreateNewGame);
@@ -76,7 +76,7 @@ function hostStartGame(gameId){   // logic that randomize questions, send given 
     var sock = this;
 
     // Look up the room ID in the Socket.IO manager object.
-    var room = gameSocket.manager.rooms["/" + data.gameId];
+    var room = gameSocket.adapter.rooms[data.gameId];
 
     // If the room exists...
     if( room != undefined ){
@@ -93,7 +93,7 @@ function hostStartGame(gameId){   // logic that randomize questions, send given 
 
     } else {
         // Otherwise, send an error message back to the player.
-        this.emit('error',{message: "This room does not exist."} );
+        this.emit('errors',{message: "This room does not exist."} );
     }
 }
 

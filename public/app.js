@@ -1,5 +1,7 @@
-$(document).ready(function() {
-    'use strict';
+jQuery(function($){   
+        'use strict';
+
+
     /**
      * All the code relevant to Socket.IO is collected in the IO namespace.
      *
@@ -26,7 +28,7 @@ $(document).ready(function() {
             IO.socket.on('onNewQuestionData', IO.onNewQuestionData);
             IO.socket.on('hostCheckAnswer', IO.hostCheckAnswer);
             IO.socket.on('gameOver', IO.gameOver);
-            IO.socket.on('error', IO.error );
+            IO.socket.on('errors', IO.error );
         },
 
         /**
@@ -51,6 +53,7 @@ $(document).ready(function() {
          * @param data {{playerName: string, gameId: int, mySocketId: int}}
          */
          playerJoinedRoom : function(data) {
+            console.log("This is playerJoinedRoom function");
             // When a player joins a room, do the updateWaitingScreen funciton.
             // There are two versions of this function: one for the 'host' and
             // another for the 'player'.
@@ -154,10 +157,10 @@ $(document).ready(function() {
          bindEvents: function () {
             // Host
             App.$doc.on('click', '#btnCreateGame', App.Host.onCreateClick);
-            //TODO btn STARTGAME btn
+            //TODO btn STARTGAME
             // Player
             App.$doc.on('click', '#btnJoinGame', App.Player.onJoinClick);
-            App.$doc.on('click', '#btnStart',App.Player.onPlayerStartClick);
+            App.$doc.on('click', '#btnJoinRoom',App.Player.onPlayerJoinRoomClick);
             App.$doc.on('click', '.btnAnswer',App.Player.onPlayerAnswerClick);
             App.$doc.on('click', '#btnGameAlreadyStarted', App.Player.onGameAlreadyStarted); //cant join beacause game already started
         },
@@ -229,6 +232,7 @@ $(document).ready(function() {
                 // Display the URL on screen
                 $('#gameURL').text(window.location.href);
                 App.doTextFit('#gameURL');
+
 
                 // Show the gameId / room id on screen
                 $('#spanNewGameCode').text(App.gameId);
@@ -332,6 +336,23 @@ $(document).ready(function() {
             },
 
 
+            onPlayerJoinRoomClick: function () {
+                    console.log('Player clicked "Join Room"');
+                     // collect data to send to the server
+
+                var data = {
+                    gameId : +($('#inputGameId').val()),
+                    playerName : $('#inputPlayerName').val() || 'anonymous'
+                };
+
+                // Send the gameId and playerName to the server
+                IO.socket.emit('playerJoinGame', data);
+                // Set the appropriate properties for the current player.
+                App.myRole = 'Player';
+                App.Player.myName = data.playerName;
+
+
+            },
 
             onPlayerAnswerClick: function() {
                 // console.log('Clicked Answer Button');
@@ -401,7 +422,7 @@ $(document).ready(function() {
         },
 
 
-        
+
 
           /* **************************
                   UTILITY CODE
