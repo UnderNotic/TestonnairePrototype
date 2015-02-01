@@ -1,5 +1,5 @@
 jQuery(function($){   
-        'use strict';
+    'use strict';
 
 
     /**
@@ -239,20 +239,23 @@ jQuery(function($){
             },
 
             /**
-             * Update the Host screen when the first player joins
+             * Update the Host screen when the player joins
              * @param data{{playerName: string}}
              */
              updateWaitingScreen: function(data) {
+                App.Host.numPlayersInRoom++;
                 // Update host screen
                 $('#playersWaiting')
                 .append('<p/>')
                 .text('Player ' + data.playerName + ' joined!');
 
+              $('#lobby > tbody:last').append('<tr><td>'+App.Host.numPlayersInRoom+'</td><td>'+data.playerName+'</td></tr>');
+
                 // Store the new player's data on the Host.
                 App.Host.players.push(data);
 
                 // Increment the number of players in the room
-                App.Host.numPlayersInRoom += 1;
+                data.playerName += 1;
 
                 // If button clicked START THE GAME!
                 
@@ -337,13 +340,13 @@ jQuery(function($){
 
 
             onPlayerJoinRoomClick: function () {
-                    console.log('Player clicked "Join Room"');
+                console.log('Player clicked "Join Room"');
                      // collect data to send to the server
 
-                var data = {
-                    gameId : +($('#inputGameId').val()),
-                    playerName : $('#inputPlayerName').val() || 'anonymous'
-                };
+                     var data = {
+                        gameId : +($('#inputGameId').val()),
+                        playerName : $('#inputPlayerName').val() || 'anonymous'
+                    };
 
                 // Send the gameId and playerName to the server
                 IO.socket.emit('playerJoinGame', data);
@@ -371,7 +374,7 @@ jQuery(function($){
             },
 
             updateWaitingScreen : function(data) {
-                if(IO.socket.socket.sessionid === data.mySocketId){
+                if(IO.socket.io.engine.id === data.mySocketId){
                     App.myRole = 'Player';
                     App.gameId = data.gameId;
 
