@@ -5,7 +5,7 @@ jQuery(function($){
     /**
      * All the code relevant to Socket.IO is collected in the IO namespace.
      *
-     * @type {{init: Function, bindEvents: Function, onConnected: Function, onNewGameCreated: Function, playerJoinedRoom: Function, beginNewGame: Function, onNewWordData: Function, hostCheckAnswer: Function, gameOver: Function, error: Function}}
+     * @type {{init: Function, bindEvents: Function, onConnected: Function, onNewGameCreated: Function, playerJoinedRoom: Function, beginNewGae: Function, onNewWordData: Function, hostCheckAnswer: Function, gameOver: Function, error: Function}}
      */
      var IO = {
         /**
@@ -25,7 +25,7 @@ jQuery(function($){
             IO.socket.on('connected', IO.onConnected );
             IO.socket.on('newGameCreated', IO.onNewGameCreated );
             IO.socket.on('playerJoinedRoom', IO.playerJoinedRoom );
-            IO.socket.on('onNewQuestionData', IO.onNewQuestionData);
+            IO.socket.on('newQuestionData', IO.onNewQuestionData);
             IO.socket.on('hostCheckAnswer', IO.hostCheckAnswer);
             IO.socket.on('gameOver', IO.gameOver);
             IO.socket.on('errors', IO.error );
@@ -53,7 +53,6 @@ jQuery(function($){
          * @param data {{playerName: string, gameId: int, mySocketId: int}}
          */
          playerJoinedRoom : function(data) {
-            console.log("This is playerJoinedRoom function");
             // When a player joins a room, do the updateWaitingScreen funciton.
             // There are two versions of this function: one for the 'host' and
             // another for the 'player'.
@@ -70,9 +69,9 @@ jQuery(function($){
          */
          onNewQuestionData : function(data) {
             // Update the current round
-            App.currentRound = data.round;
+            App.Player.currentQuestion = data.questionNumber;
 
-            // Change the word for the Host and Player
+            // Change the question for the Player
             App[App.myRole].newWord(data);
         },
 
@@ -80,7 +79,7 @@ jQuery(function($){
          * A player answered. If this is the host, check the answer.
          * @param data
          */
-         hostCheckAnswer : function(data) {
+         hostCheckAnswer : function(data) { //check answers after all the game played out
             if(App.myRole === 'Host') {
                 App.Host.checkAnswer(data);  //TODO change name of this
             }
@@ -121,6 +120,7 @@ jQuery(function($){
         numberOfQuestion: 0,
 
 
+
         /* *************************************
          *                Setup                *
          * *********************************** */
@@ -157,7 +157,7 @@ jQuery(function($){
          bindEvents: function () {
             // Host
             App.$doc.on('click', '#btnCreateGame', App.Host.onCreateClick);
-            //TODO btn STARTGAME
+            App.$doc.on('click', '#btnStartGame', App.Host.onStartClick);
             // Player
             App.$doc.on('click', '#btnJoinGame', App.Player.onJoinClick);
             App.$doc.on('click', '#btnJoinRoom',App.Player.onPlayerJoinRoomClick);
@@ -187,7 +187,10 @@ jQuery(function($){
             /**
              * Contains references to player data
              */
-             players : [],
+             players : {},
+
+
+
 
             /**
              * Keep track of the number of players that have joined the game.
@@ -206,6 +209,11 @@ jQuery(function($){
              onCreateClick: function () {
                 // console.log('Clicked "Create A Game"');
                 IO.socket.emit('hostCreateNewGame');
+            },
+
+             onStartClick: function(){
+                console.log("Game started!");
+                App[App.myRole].gameCountdown();   // starting game countdown!
             },
 
             /**
@@ -251,8 +259,7 @@ jQuery(function($){
 
               $('#lobby > tbody:last').append('<tr><td>'+App.Host.numPlayersInRoom+'</td><td>'+data.playerName+'</td></tr>');
 
-                // Store the new player's data on the Host.
-                App.Host.players.push(data);
+           
 
                 // Increment the number of players in the room
                 data.playerName += 1;
@@ -261,12 +268,29 @@ jQuery(function($){
                 
             },
 
+            gameCountdown : function(){
+
+                 // Prepare the game screen with new HTML
+                 //hmmmm maybe ongoing question and current points
+                 //show result after all
+                 App.$gameArea.html(App.$hostGame);
+
+                // Begin the on-screen countdown timer
+                var $secondsLeft = $('#hostWord');
+                  App.countDown( $secondsLeft, 5, function(){
+                    IO.socket.emit('hostCountdownFinished', App.gameId);
+                });
+
+            },
+
 
             /**
              * Show the word for the current round on screen.
              * @param data{{round: *, word: *, answer: *, list: Array}}
              */
-            newWord : function(data) { //TODo
+            newQuestion : function(data) { //TODo
+
+                //get question id for specific user and show it in lobby
             },
 
 
@@ -274,7 +298,21 @@ jQuery(function($){
              * Check the answer clicked by a player.
              * @param data{{round: *, playerId: *, answer: *, gameId: *}}
              */
-            checkAnswer : function(data) { //TODO
+            checkAnswer : function(data) { //TODO  potrzeba w dacie playername
+
+                var currentQuestion = data.currentQuestion;
+                var answer = data.answer;
+                var playerName = data.playerName;
+                
+                //creating hashmap collection with question number and answer binded with playername object
+                App.Host.players[playerName] = {
+                    questionNumber: currentQuestion,
+                    playerAnswer: answer
+
+                };
+
+
+
             },
 
 
@@ -327,6 +365,9 @@ jQuery(function($){
              */
              myName: '',
 
+             /*Question id that player is currently giving answer to*/
+             currentQuestion: 0,
+
 
             /**
              * Click handler for the 'JOIN' button
@@ -362,13 +403,13 @@ jQuery(function($){
                 var $btn = $(this);      // the tapped button
                 var answer = $btn.val(); // The tapped word
 
-                // Send the player info and tapped word to the server so
-                // the host can check the answer.
+                // Send tapped answers to the server
                 var data = {
                     gameId: App.gameId,
                     playerId: App.mySocketId,
+                    playerName: App.Player.myName,
                     answer: answer,
-                    round: App.currentRound
+                    currentQuestion: App.Host.currentQuestion
                 }
                 IO.socket.emit('playerAnswer',data);
             },
@@ -378,19 +419,29 @@ jQuery(function($){
                     App.myRole = 'Player';
                     App.gameId = data.gameId;
 
+                    $('#btnJoinRoom').attr("disabled", true);
                     $('#playerWaitingMessage')
                     .append('<p/>')
                     .text('Joined Game ' + data.gameId + '. Please wait for game to begin.');
                 }
             },
 
-            newWord : function(data) {
+
+            gameCountdown : function(){
+
+                $('#gameArea')
+                    .html('<div class="gameOver">Get Ready!</div>');
+
+
+            },
+
+            newQuestion : function(data) {
                 // Create an unordered list element
                 var $list = $('<ul/>').attr('id','ulAnswers');
 
                 // Insert a list item for each word in the word list
                 // received from the server.
-                $.each(data.list, function(){
+                $.each(data.answers, function(){
                     $list                                //  <ul> </ul>
                         .append( $('<li/>')              //  <ul> <li> </li> </ul>
                             .append( $('<button/>')      //  <ul> <li> <button> </button> </li> </ul>
@@ -427,7 +478,7 @@ jQuery(function($){
 
 
 
-          /* **************************
+                 /* **************************
                   UTILITY CODE
                   ************************** */
 

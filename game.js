@@ -19,7 +19,7 @@ exports.initGame = function(sio, socket){
 
 	// Host Events
     gameSocket.on('hostCreateNewGame', hostCreateNewGame);
-    gameSocket.on('hostStartGame', hostStartGame);
+    gameSocket.on('hostCountdownFinished', hostStartGame);
 
 
     // Player Events
@@ -102,7 +102,7 @@ function hostStartGame(gameId){   // logic that randomize questions, send given 
  * @param data gameId
  */
 function playerAnswer(data) {
-    console.log('Player ID: ' + data.playerId + ' answered a question with: ' + data.answer);
+    console.log('Player ID: ' + data.playerId + ' answered a question number :' + data.currentQuestion + ' with: ' + data.answer);
 
     // The player's answer is attached to the data object.  \
     // Emit an event with the answer so it can be checked by the 'Host'
@@ -138,22 +138,23 @@ function playerAnswer(data) {
     // The second element will be hidden in a list of decoys as the correct answer
 
     var i = 0;
-    var answers = shuffle(sampleQuestions[i].answer);
+    var correctAnswers = shuffle(sampleQuestions[i].answer);
 
     // Randomize the order of the decoy words and choose the first 3
     var decoys = shuffle(sampleQuestions[i].decoys).slice(0,3);
 
     // Pick a random spot in the decoy list to put the correct answer
     var rnd = Math.floor(Math.random() * 4); //correct
-    decoys.splice(rnd, 0, answers[0]);   // TODO dynamic number of answers not only one
+    var answers =decoys.splice(rnd, 0, answers[0]);   // TODO dynamic number of answers not only one
 
     // Package the words into a single object.
-    var wordData = {
-        answer : answers, // Correct Answer
-        decoys : decoys      // Word list for player (decoys and answer)
+    var questionData = {
+        questionNumber: i+1,
+        question: sampleQuestions[i].question,
+        answers: answers, // Correct Answer
     };
 
-    return wordData;
+    return questionData;
    }
 
 /*
