@@ -72,7 +72,7 @@ jQuery(function($){
             App.Player.currentQuestion = data.questionNumber;
 
             // Change the question for the Player
-            App[App.myRole].newWord(data);
+            App[App.myRole].newQuestion(data);
         },
 
         /**
@@ -436,6 +436,8 @@ jQuery(function($){
             },
 
             newQuestion : function(data) {
+
+
                 // Create an unordered list element
                 var $list = $('<ul/>').attr('id','ulAnswers');
 

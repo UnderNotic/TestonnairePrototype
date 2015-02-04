@@ -12,21 +12,21 @@ var gameSocket;
  * @param socket The socket object for the connected client.
  */
 
-exports.initGame = function(sio, socket){
+ exports.initGame = function(sio, socket){
 	io = sio; 	//library
 	gameSocket = socket; 	//connected client socket
 	gameSocket.emit("connected", {message: "You are connected!"});  
 
 	// Host Events
-    gameSocket.on('hostCreateNewGame', hostCreateNewGame);
-    gameSocket.on('hostCountdownFinished', hostStartGame);
+  gameSocket.on('hostCreateNewGame', hostCreateNewGame);
+  gameSocket.on('hostCountdownFinished', hostStartGame);
 
 
     // Player Events
     gameSocket.on('playerJoinGame', playerJoinGame);
     gameSocket.on('playerAnswer', playerAnswer);
 
-};
+  };
 
 
 /* *******************************
@@ -38,7 +38,7 @@ exports.initGame = function(sio, socket){
 /**
  * The 'START' button was clicked and 'hostCreateNewGame' event occurred.
  */
-function hostCreateNewGame() {
+ function hostCreateNewGame() {
     // Create a unique Socket.IO Room
     var thisGameId = ( Math.random() * 100000 ) | 0; //  | 0 means rounding down a number
 
@@ -47,7 +47,7 @@ function hostCreateNewGame() {
 
     // Join the Room randomly created and wait for the players
     this.join(thisGameId.toString());
-}           
+  }           
 
 function hostStartGame(gameId){   // logic that randomize questions, send given number of unique questions 
   console.log("Test started!");
@@ -70,7 +70,7 @@ function hostStartGame(gameId){   // logic that randomize questions, send given 
  */
 
  function playerJoinGame(data) {
-    console.log('Player ' + data.playerName + 'attempting to join game: ' + data.gameId );
+  console.log('Player ' + data.playerName + 'attempting to join game: ' + data.gameId );
 
     // A reference to the player's Socket.IO socket object
     var sock = this;
@@ -91,25 +91,25 @@ function hostStartGame(gameId){   // logic that randomize questions, send given 
         // Emit an event notifying everyone in room that the player has joined the room.
         io.sockets.in(data.gameId).emit('playerJoinedRoom', data);
 
-    } else {
+      } else {
         // Otherwise, send an error message back to the player.
         this.emit('errors',{message: "This room does not exist."} );
+      }
     }
-}
 
 /**
  * A player has tapped a word in the word list.
  * @param data gameId
  */
-function playerAnswer(data) {
-    console.log('Player ID: ' + data.playerId + ' answered a question number :' + data.currentQuestion + ' with: ' + data.answer);
+ function playerAnswer(data) {
+  console.log('Player ID: ' + data.playerId + ' answered a question number :' + data.currentQuestion + ' with: ' + data.answer);
 
     // The player's answer is attached to the data object.  \
     // Emit an event with the answer so it can be checked by the 'Host'
     // Or check on server-side with mongodb and send to host if answer was correct
 
     io.sockets.in(data.gameId).emit('hostCheckAnswer', data);
-}
+  }
 
 
 
@@ -121,50 +121,51 @@ function playerAnswer(data) {
 
 
   //send a question to player
-   function sendQuestion(gameId){
+  function sendQuestion(gameId){
     var questionData = getQuestionData();
-    //DELAY ??
+    console.log("Question sent!");
 
-    io.sockets.in(data.gameId).emit('newQuestionData', questionData);  //sending question 
-   }
+    io.sockets.in(gameId).emit('newQuestionData', questionData);  //sending question 
+  }
 
 /**
  * TODO : randomization of question(uniquness!), user can define number of answers
  */
-   function getQuestionData(){  
+ function getQuestionData(){  
 
 // Randomize the order of the available words.
     // The first element in the randomized array will be displayed on the host screen.
     // The second element will be hidden in a list of decoys as the correct answer
 
     var i = 0;
-    var correctAnswers = shuffle(sampleQuestions[i].answer);
+    var correctAnswers = shuffle(sampleQuestions[i].answers);
+        correctAnswers = correctAnswers[0];
 
     // Randomize the order of the decoy words and choose the first 3
     var decoys = shuffle(sampleQuestions[i].decoys).slice(0,3);
 
     // Pick a random spot in the decoy list to put the correct answer
     var rnd = Math.floor(Math.random() * 4); //correct
-    var answers =decoys.splice(rnd, 0, answers[0]);   // TODO dynamic number of answers not only one
+    var answers = decoys.splice(rnd, 0, correctAnswers);   // TODO dynamic number of answers not only one
 
     // Package the words into a single object.
     var questionData = {
-        questionNumber: i+1,
-        question: sampleQuestions[i].question,
+      questionNumber: i+1,
+      question: sampleQuestions[i].question,
         answers: answers, // Correct Answer
-    };
+      };
 
-    return questionData;
-   }
+      return questionData;
+    }
 
 /*
  * Javascript implementation of Fisher-Yates shuffle algorithm
  * http://stackoverflow.com/questions/2450954/how-to-randomize-a-javascript-array
  */
-function shuffle(array) {
-    var currentIndex = array.length;
-    var temporaryValue;
-    var randomIndex;
+ function shuffle(array) {
+  var currentIndex = array.length;
+  var temporaryValue;
+  var randomIndex;
 
     // While there remain elements to shuffle...
     while (0 !== currentIndex) {
@@ -177,20 +178,20 @@ function shuffle(array) {
         temporaryValue = array[currentIndex];
         array[currentIndex] = array[randomIndex];
         array[randomIndex] = temporaryValue;
+      }
+
+      return array;
     }
 
-    return array;
-}
 
 
 
 
-
-   var sampleQuestions = [
+    var sampleQuestions = [
 
     {
-        question  : "What colour is red car?" ,
-        decoys : [ "trata, answer2, answer3" ],
-        answers : ["red"]
+      question  : "What colour is red car?" ,
+      decoys : [ "trata, answer2, answer3" ],
+      answers : ["red"]
     },
-   ];
+    ];
