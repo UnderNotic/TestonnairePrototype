@@ -27,7 +27,7 @@ jQuery(function($){
             IO.socket.on('playerJoinedRoom', IO.playerJoinedRoom );
             IO.socket.on('newQuestionData', IO.onNewQuestionData);
             IO.socket.on('hostStoreAnswer', IO.hostStoreAnswer);
-            IO.socket.on('gameOver', IO.gameOver);
+            IO.socket.on('endGame', IO.endGame);
             IO.socket.on('errors', IO.error );
         },
 
@@ -89,8 +89,8 @@ jQuery(function($){
          * Let everyone know the game has ended.
          * @param data
          */
-        gameOver : function(data) {   //TODO implement this in game.js
-            App[App.myRole].endGame(data);
+        endGame : function() {   //TODO implement this in game.js
+            App[App.myRole].endGame();
         },
 
         /**
@@ -212,8 +212,14 @@ jQuery(function($){
             },
 
              onStartClick: function(){
+                if(App.Host.numPlayersInRoom===0)
+                {
+                    alert("You can NOT start the game without players");
+                }
+                else{
                 console.log("Game started!");
                 App[App.myRole].gameCountdown();   // starting game countdown!
+            }
             },
 
             /**
@@ -315,32 +321,7 @@ jQuery(function($){
             },
 
 
-            /**
-             * All 10 rounds have played out. End the game.
-             * @param data
-             */
              endGame : function(data) {
-                // Get the data for player 1 from the host screen
-                var $p1 = $('#player1Score');
-                var p1Score = +$p1.find('.score').text();
-                var p1Name = $p1.find('.playerName').text();
-
-                // Get the data for player 2 from the host screen
-                var $p2 = $('#player2Score');
-                var p2Score = +$p2.find('.score').text();
-                var p2Name = $p2.find('.playerName').text();
-
-                // Find the winner based on the scores
-                var winner = (p1Score < p2Score) ? p2Name : p1Name;
-                var tie = (p1Score === p2Score);
-
-                // Display the winner (or tie game message)
-                if(tie){
-                    $('#hostWord').text("It's a Tie!");
-                } else {
-                    $('#hostWord').text( winner + ' Wins!!' );
-                }
-                App.doTextFit('#hostWord');
 
                 // Reset game data
                 App.Host.numPlayersInRoom = 0;
@@ -468,14 +449,7 @@ jQuery(function($){
              */
              endGame : function() {
                 $('#gameArea')
-                .html('<div class="gameOver">Game Over!</div>')
-                .append(
-                        // Create a button to start a new game.
-                        $('<button>Start Again</button>')
-                        .attr('id','btnPlayerRestart')
-                        .addClass('btn')
-                        .addClass('btnGameOver')
-                        );
+                .html('<div class="gameOver">Game Over!</div>');
             }
         },
 

@@ -123,11 +123,14 @@ function hostStartGame(gameId){   // logic that randomize questions, send given 
   //send a question to player
   function sendQuestion(gameId){ //TODO Add arguments to function: numberOFQuestion and uniqess of questions
 
+    var timeForQuestion = 8000; 
     var time=0;
-    for(var i = 0; i < 4; i++){
+    for(var i = 0; i < 1; i++){
     setTimeout(emitQuestion, time, gameId);
-    time = time + 8000;
+    time = time + timeForQuestion;
     }
+    //after all question end the Game
+    endGame(gameId, timeForQuestion);
   }
 
 
@@ -173,14 +176,29 @@ function hostStartGame(gameId){   // logic that randomize questions, send given 
     }
 
 
+function endGame(gameId, timeForQuestion){
+
+console.log("Ending game");
+setTimeout(function(){
+  io.sockets.in(gameId).emit('endGame');
+  },timeForQuestion);
+
+
+
+}
+
+
+
+
+
+                /* **************************
+                         UTILITY CODE
+                  ************************** */
 
 function getRandomInt(min, max) {
   max = max+1;
   return Math.floor(Math.random() * (max - min)) + min;
 }
-
-
-
 
 /*
  * Javascript implementation of Fisher-Yates shuffle algorithm
