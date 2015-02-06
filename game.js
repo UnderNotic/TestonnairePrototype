@@ -102,13 +102,13 @@ function hostStartGame(gameId){   // logic that randomize questions, send given 
  * @param data gameId
  */
  function playerAnswer(data) {
-  console.log('Player ID: ' + data.playerId + ' answered a question number :' + data.currentQuestion + ' with: ' + data.answer);
+  console.log('Player: ' + data.playerName + ' answered a question number :' + data.currentQuestion + ' with: ' + data.answer);
 
     // The player's answer is attached to the data object.  \
     // Emit an event with the answer so it can be checked by the 'Host'
     // Or check on server-side with mongodb and send to host if answer was correct
 
-    io.sockets.in(data.gameId).emit('hostCheckAnswer', data);
+    io.sockets.in(data.gameId).emit('hostStoreAnswer', data);
   }
 
 
@@ -121,10 +121,21 @@ function hostStartGame(gameId){   // logic that randomize questions, send given 
 
 
   //send a question to player
-  function sendQuestion(gameId){
+  function sendQuestion(gameId){ //TODO Add arguments to function: numberOFQuestion and uniqess of questions
+
+    var time=0;
+    for(var i = 0; i < 4; i++){
+    setTimeout(emitQuestion, time, gameId);
+    time = time + 8000;
+    }
+  }
+
+
+
+  function emitQuestion(gameId){
+    console.log("debug");
     var questionData = getQuestionData();
     console.log("Question sent!");
-
     io.sockets.in(gameId).emit('newQuestionData', questionData);  //sending question 
   }
 
@@ -137,26 +148,39 @@ function hostStartGame(gameId){   // logic that randomize questions, send given 
     // The first element in the randomized array will be displayed on the host screen.
     // The second element will be hidden in a list of decoys as the correct answer
 
-    var i = 0;
-    var correctAnswers = shuffle(sampleQuestions[i].answers);
+    // Pick a random answer 
+    var rnd1 = getRandomInt(0, sampleQuestions.length-1);
+    var correctAnswers = shuffle(sampleQuestions[rnd1].answers);
         correctAnswers = correctAnswers[0];
 
     // Randomize the order of the decoy words and choose the first 3
-    var decoys = shuffle(sampleQuestions[i].decoys).slice(0,3);
-
+    var decoys = shuffle(sampleQuestions[rnd1].decoys).slice(0,3);
     // Pick a random spot in the decoy list to put the correct answer
-    var rnd = Math.floor(Math.random() * 4); //correct
-    var answers = decoys.splice(rnd, 0, correctAnswers);   // TODO dynamic number of answers not only one
+    var rnd2 = getRandomInt(0,3); //correct
+    decoys.splice(rnd2, 0, correctAnswers);   // TODO dynamic number of answers not only one
+    var answers = decoys;
 
     // Package the words into a single object.
     var questionData = {
-      questionNumber: i+1,
-      question: sampleQuestions[i].question,
+      questionNumber: rnd1+1,
+      question: sampleQuestions[rnd1].question,
         answers: answers, // Correct Answer
       };
 
+      console.log(questionData);
+
       return questionData;
     }
+
+
+
+function getRandomInt(min, max) {
+  max = max+1;
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
+
+
 
 /*
  * Javascript implementation of Fisher-Yates shuffle algorithm
@@ -191,7 +215,24 @@ function hostStartGame(gameId){   // logic that randomize questions, send given 
 
     {
       question  : "What colour is red car?" ,
-      decoys : [ "trata, answer2, answer3" ],
+      decoys : [ "trata", "answer2", "answer3" ],
       answers : ["red"]
     },
+    {
+      question  : "Who is the BOSS?" ,
+      decoys : [ "Dad", "aaaa", "ssss" ],
+      answers : ["ME"]
+    },
+    {
+      question  : "Tell me your story?" ,
+      decoys : [ "secret story", "drama", "island" ],
+      answers : ["Gatsby is great"]
+    },
+    {
+      question  : "Your mother name?" ,
+      decoys : [ "Alla", "Mana", "Mulka" ],
+      answers : ["Elli"]
+    }
+
+
     ];

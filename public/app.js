@@ -26,7 +26,7 @@ jQuery(function($){
             IO.socket.on('newGameCreated', IO.onNewGameCreated );
             IO.socket.on('playerJoinedRoom', IO.playerJoinedRoom );
             IO.socket.on('newQuestionData', IO.onNewQuestionData);
-            IO.socket.on('hostCheckAnswer', IO.hostCheckAnswer);
+            IO.socket.on('hostStoreAnswer', IO.hostStoreAnswer);
             IO.socket.on('gameOver', IO.gameOver);
             IO.socket.on('errors', IO.error );
         },
@@ -79,9 +79,9 @@ jQuery(function($){
          * A player answered. If this is the host, check the answer.
          * @param data
          */
-         hostCheckAnswer : function(data) { //check answers after all the game played out
+         hostStoreAnswer : function(data) { //check answers after all the game played out
             if(App.myRole === 'Host') {
-                App.Host.checkAnswer(data);  //TODO change name of this
+                App.Host.storeAnswer(data);  
             }
         },
 
@@ -259,10 +259,12 @@ jQuery(function($){
 
               $('#lobby > tbody:last').append('<tr><td>'+App.Host.numPlayersInRoom+'</td><td>'+data.playerName+'</td></tr>');
 
-           
+                //Init tab with player answers and questions
+                App.Host.players[data.playerName] = [];
 
                 // Increment the number of players in the room
                 data.playerName += 1;
+
 
                 // If button clicked START THE GAME!
                 
@@ -298,19 +300,16 @@ jQuery(function($){
              * Check the answer clicked by a player.
              * @param data{{round: *, playerId: *, answer: *, gameId: *}}
              */
-            checkAnswer : function(data) { //TODO  potrzeba w dacie playername
+            storeAnswer : function(data) {
 
                 var currentQuestion = data.currentQuestion;
                 var answer = data.answer;
                 var playerName = data.playerName;
                 
                 //creating hashmap collection with question number and answer binded with playername object
-                App.Host.players[playerName] = {
-                    questionNumber: currentQuestion,
-                    playerAnswer: answer
+                App.Host.players[playerName][currentQuestion]=answer;
 
-                };
-
+                console.log(App.Host.players);
 
 
             },
@@ -409,8 +408,8 @@ jQuery(function($){
                     playerId: App.mySocketId,
                     playerName: App.Player.myName,
                     answer: answer,
-                    currentQuestion: App.Host.currentQuestion
-                }
+                    currentQuestion: App.Player.currentQuestion
+                };
                 IO.socket.emit('playerAnswer',data);
             },
 
@@ -436,15 +435,17 @@ jQuery(function($){
             },
 
             newQuestion : function(data) {
-
+                var $question = $('<div/>');
+              //  $question.addClass('info').html(data.question);
+                $question.addClass("info").text(data.question);
 
                 // Create an unordered list element
-                var $list = $('<ul/>').attr('id','ulAnswers');
+                var $answers = $('<ul/>').attr('id','ulAnswers');
 
-                // Insert a list item for each word in the word list
+                // Insert a answers item for each word in the word answers
                 // received from the server.
                 $.each(data.answers, function(){
-                    $list                                //  <ul> </ul>
+                    $answers                                //  <ul> </ul>
                         .append( $('<li/>')              //  <ul> <li> </li> </ul>
                             .append( $('<button/>')      //  <ul> <li> <button> </button> </li> </ul>
                                 .addClass('btnAnswer')   //  <ul> <li> <button class='btnAnswer'> </button> </li> </ul>
@@ -452,11 +453,12 @@ jQuery(function($){
                                 .val(this)               //  <ul> <li> <button class='btnAnswer' value='word'> </button> </li> </ul>
                                 .html(this)              //  <ul> <li> <button class='btnAnswer' value='word'>word</button> </li> </ul>
                                 )
-                            )
+                            );
                     });
 
-                // Insert the list onto the screen.
-                $('#gameArea').html($list);
+                $question.append($answers);
+                // Insert onto the screen.
+                $('#gameArea').html($question);
             },
 
 
