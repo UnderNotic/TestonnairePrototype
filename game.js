@@ -123,14 +123,16 @@ function hostStartGame(gameId){   // logic that randomize questions, send given 
   //send a question to player
   function sendQuestion(gameId){ //TODO Add arguments to function: numberOFQuestion and uniqess of questions
 
+    var numberOfQuestions = 2;
     var timeForQuestion = 8000; 
     var time=0;
-    for(var i = 0; i < 1; i++){
+    for(var i = 0; i < numberOfQuestions; i++){
     setTimeout(emitQuestion, time, gameId);
     time = time + timeForQuestion;
     }
-    //after all question end the Game
-    endGame(gameId, timeForQuestion);
+    //after all questions end the Game
+    console.log("timeForQuestion*timeForQuestion " + timeForQuestion*timeForQuestion);
+    endGame(gameId, timeForQuestion*numberOfQuestions);
   }
 
 
@@ -176,12 +178,12 @@ function hostStartGame(gameId){   // logic that randomize questions, send given 
     }
 
 
-function endGame(gameId, timeForQuestion){
+function endGame(gameId, wait){ //TODO TEST IN MONGODB AND CHECKING ON SERVER SIDE
 
 console.log("Ending game");
 setTimeout(function(){
   io.sockets.in(gameId).emit('endGame');
-  },timeForQuestion);
+  },wait);
 
 
 
