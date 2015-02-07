@@ -113,7 +113,6 @@ jQuery(function($){
          gameId: 0,
 
 
-
         mySocketId: 0,
 
          /**
@@ -190,12 +189,12 @@ jQuery(function($){
            Host : {
 
             /**
-             * Contains references to player data
+             * Contains player data: socketid, name, question and answers
              */
              players : {},
 
-
-
+             /*Constains players sockedId*/
+             playersSocketId: [],
 
             /**
              * Keep track of the number of players that have joined the game.
@@ -276,7 +275,8 @@ jQuery(function($){
 
                 //Init tab with player answers and questions
                 App.Host.players[data.playerName] = [];
-                App.Host.players[data.playerName][0] = data.mySocketId;
+                App.Host.players[data.playerName][0] = data.mySocketId; //maybe some kind of authentication security method?
+                App.Host.playersSocketId.push(data.mySocketId);
 
 
 
@@ -294,7 +294,7 @@ jQuery(function($){
                 // Begin the on-screen countdown timer
                 var $secondsLeft = $('#hostWord');
                   App.countDown( $secondsLeft, 5, function(){
-                    IO.socket.emit('hostCountdownFinished', App.gameId, App.Host.players);
+                    IO.socket.emit('hostCountdownFinished', App.Host.playersSocketId, App.gameId);
                 });
 
             },

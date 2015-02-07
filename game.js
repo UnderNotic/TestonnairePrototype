@@ -49,10 +49,10 @@ var gameSocket;
     this.join(thisGameId.toString());
   }           
 
-function hostStartGame(gameId, players){   // logic that randomize questions, send given number of unique questions 
+function hostStartGame(playersSockets, gameId){   // logic that randomize questions, send given number of unique questions 
   console.log("Test started!");
-  console.log(players);
-  sendQuestion(gameId);  //send a question to a player
+  console.log(playersSockets);
+  sendQuestion(playersSockets, gameId);  //send a question to a player
 }    
 
 
@@ -121,34 +121,37 @@ function hostStartGame(gameId, players){   // logic that randomize questions, se
    ************************* */
 
 
+   
+   
   //send a question to player
-  function sendQuestion(gameId){ //TODO Add arguments to function: numberOFQuestion and uniqess of questions
+  function sendQuestion(playersSockets, gameId){ //TODO Add arguments to function: numberOFQuestion and uniqess of questions
 
     var numberOfQuestions = 4;
     var timeForQuestion = 8000; 
     var time=0;
     for(var i = 0; i < numberOfQuestions; i++){
-    setTimeout(emitQuestion, time, gameId);
-    time = time + timeForQuestion;
-    }
+
+      for(var j = 0; j < playersSockets.length; j++){
+        setTimeout(emitQuestion, time, playersSockets[j]);
+      }
+        time = time + timeForQuestion;
     //after all questions end the Game
-    console.log("timeForQuestion*timeForQuestion " + timeForQuestion*timeForQuestion);
     endGame(gameId, timeForQuestion*numberOfQuestions);
-  }
+    }
+  } 
 
 
-
-  function emitQuestion(gameId){
-    console.log("debug");
-    var questionData = getQuestionData();
-    console.log("Question sent!");
-    io.sockets.in(gameId).emit('newQuestionData', questionData);  //sending question 
+function emitQuestion(playerSocket){
+  console.log("debug");
+  var questionData = getQuestionData(playerSocket);
+  console.log("Question sent!");
+    io.to(playerSocket).emit('newQuestionData', questionData);  //sending question 
   }
 
 /**
  * TODO : randomization of question(uniquness!), user can define number of answers
  */
- function getQuestionData(){  
+ function getQuestionData(playerSocket){  
 
 // Randomize the order of the available words.
     // The first element in the randomized array will be displayed on the host screen.
@@ -157,7 +160,7 @@ function hostStartGame(gameId, players){   // logic that randomize questions, se
     // Pick a random answer 
     var rnd1 = getRandomInt(0, sampleQuestions.length-1);
     var correctAnswers = shuffle(sampleQuestions[rnd1].answers);
-        correctAnswers = correctAnswers[0];
+    correctAnswers = correctAnswers[0];
 
     // Randomize the order of the decoy words and choose the first 3
     var decoys = shuffle(sampleQuestions[rnd1].decoys).slice(0,3);
@@ -181,9 +184,9 @@ function hostStartGame(gameId, players){   // logic that randomize questions, se
 
 function endGame(gameId, wait){ //TODO TEST IN MONGODB AND CHECKING ON SERVER SIDE
 
-console.log("Ending game");
-setTimeout(function(){
-  io.sockets.in(gameId).emit('endGame');
+  console.log("Ending game");
+  setTimeout(function(){
+    io.sockets.in(gameId).emit('endGame');
   },wait);
 
 
@@ -196,12 +199,12 @@ setTimeout(function(){
 
                 /* **************************
                          UTILITY CODE
-                  ************************** */
+                         ************************** */
 
-function getRandomInt(min, max) {
-  max = max+1;
-  return Math.floor(Math.random() * (max - min)) + min;
-}
+                         function getRandomInt(min, max) {
+                          max = max+1;
+                          return Math.floor(Math.random() * (max - min)) + min;
+                        }
 
 /*
  * Javascript implementation of Fisher-Yates shuffle algorithm
