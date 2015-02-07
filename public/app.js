@@ -34,10 +34,11 @@ jQuery(function($){
         /**
          * The client is successfully connected!
          */
-         onConnected : function() {
-            // Cache a copy of the client's socket.IO session ID on the App
+         onConnected : function(data) {
+             // Cache a copy of the client's socket.IO session ID on the App
             App.mySocketId = IO.socket.io.engine.id;
-            // console.log(data.message);
+            //console.log("Hello!");
+            console.log(data.message);
         },
 
         /**
@@ -53,7 +54,7 @@ jQuery(function($){
          * @param data {{playerName: string, gameId: int, mySocketId: int}}
          */
          playerJoinedRoom : function(data) {
-            // When a player joins a room, do the updateWaitingScreen funciton.
+            // When a player joins a room, do the updateWaitingScreen function.
             // There are two versions of this function: one for the 'host' and
             // another for the 'player'.
             //
@@ -110,6 +111,10 @@ jQuery(function($){
          *
          */
          gameId: 0,
+
+
+
+        mySocketId: 0,
 
          /**
          * This is used to differentiate between 'Host' and 'Player' browsers.
@@ -258,6 +263,10 @@ jQuery(function($){
              */
              updateWaitingScreen: function(data) {
                 App.Host.numPlayersInRoom++;
+                
+                //data.mySocketId
+
+
                 // Update host screen
                 $('#playersWaiting')
                 .append('<p/>')
@@ -267,9 +276,8 @@ jQuery(function($){
 
                 //Init tab with player answers and questions
                 App.Host.players[data.playerName] = [];
+                App.Host.players[data.playerName][0] = data.mySocketId;
 
-                // Increment the number of players in the room
-                data.playerName += 1;
 
 
                 // If button clicked START THE GAME!
@@ -286,11 +294,10 @@ jQuery(function($){
                 // Begin the on-screen countdown timer
                 var $secondsLeft = $('#hostWord');
                   App.countDown( $secondsLeft, 5, function(){
-                    IO.socket.emit('hostCountdownFinished', App.gameId);
+                    IO.socket.emit('hostCountdownFinished', App.gameId, App.Host.players);
                 });
 
             },
-
 
             /**
              * Show the word for the current round on screen.
@@ -357,6 +364,9 @@ jQuery(function($){
 
                 // Display the Join Game HTML on the player's screen.
                 App.$gameArea.html(App.$templateJoinGame);
+
+
+
             },
 
 

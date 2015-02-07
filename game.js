@@ -49,8 +49,9 @@ var gameSocket;
     this.join(thisGameId.toString());
   }           
 
-function hostStartGame(gameId){   // logic that randomize questions, send given number of unique questions 
+function hostStartGame(gameId, players){   // logic that randomize questions, send given number of unique questions 
   console.log("Test started!");
+  console.log(players);
   sendQuestion(gameId);  //send a question to a player
 }    
 
@@ -123,7 +124,7 @@ function hostStartGame(gameId){   // logic that randomize questions, send given 
   //send a question to player
   function sendQuestion(gameId){ //TODO Add arguments to function: numberOFQuestion and uniqess of questions
 
-    var numberOfQuestions = 2;
+    var numberOfQuestions = 4;
     var timeForQuestion = 8000; 
     var time=0;
     for(var i = 0; i < numberOfQuestions; i++){

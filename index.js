@@ -40,6 +40,7 @@ io.sockets.on('connection', function (socket) {
     game.initGame(io, socket);
     socket.on('disconnect', function(){
     console.log('client disconnected from node-server');
+    //TODO client disconnected decrement numberofplayers on host, lobby and tab with connected players
   });
 
 });
