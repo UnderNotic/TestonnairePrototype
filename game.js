@@ -129,26 +129,26 @@ function hostStartGame(playersSockets, gameId){   // logic that randomize questi
     var numberOfQuestions = 4;
     var timeForQuestion = 8000; 
     var time = 0;
-    var alreadyAnsweredQuestionsNumbers ={};
-    var sentQuestionNumber = 0;
+  // var alreadyAnsweredQuestionsNumbers ={};
+   // var sentQuestionNumber = 0;
 
     //Initializing alreadyAnsweredQuestionsNumber as array in player socketId object
-    for(var i = 0; i < playersSockets.length; i++){   
-    alreadyAnsweredQuestionsNumbers[playersSockets[i]]=[];
-    }
+   // for(var i = 0; i < playersSockets.length; i++){   
+  //  alreadyAnsweredQuestionsNumbers[playersSockets[i]]=[];
+  //  }
 
 
     for(var i = 0; i < numberOfQuestions; i++){
 
       for(var j = 0; j < playersSockets.length; j++){
         setTimeout(sentQuestionNumber = emitQuestion, time, playersSockets[j], alreadyAnsweredQuestionsNumbers[playersSockets[j]]);
-        console.log("Already sent iss: " + alreadyAnsweredQuestionsNumbers[playersSockets[j]]);
-        alreadyAnsweredQuestionsNumbers[playersSockets[j]].push(sentQuestionNumber-1);
+      //  console.log("Already sent iss: " + alreadyAnsweredQuestionsNumbers[playersSockets[j]]);
+      //  alreadyAnsweredQuestionsNumbers[playersSockets[j]].push(sentQuestionNumber-1);
       }
       time = time + timeForQuestion;
     //after all questions end the Game
-    endGame(gameId, timeForQuestion*numberOfQuestions);
   }
+    endGame(gameId, timeForQuestion*numberOfQuestions);
 } 
 
 
