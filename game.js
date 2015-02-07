@@ -121,44 +121,75 @@ function hostStartGame(playersSockets, gameId){   // logic that randomize questi
    ************************* */
 
 
-   
-   
+
+
   //send a question to player
   function sendQuestion(playersSockets, gameId){ //TODO Add arguments to function: numberOFQuestion and uniqess of questions
 
     var numberOfQuestions = 4;
     var timeForQuestion = 8000; 
-    var time=0;
+    var time = 0;
+    var alreadyAnsweredQuestionsNumbers ={};
+    var sentQuestionNumber = 0;
+
+    //Initializing alreadyAnsweredQuestionsNumber as array in player socketId object
+    for(var i = 0; i < playersSockets.length; i++){   
+    alreadyAnsweredQuestionsNumbers[playersSockets[i]]=[];
+    }
+
+
     for(var i = 0; i < numberOfQuestions; i++){
 
       for(var j = 0; j < playersSockets.length; j++){
-        setTimeout(emitQuestion, time, playersSockets[j]);
+        setTimeout(sentQuestionNumber = emitQuestion, time, playersSockets[j], alreadyAnsweredQuestionsNumbers[playersSockets[j]]);
+        console.log("Already sent iss: " + alreadyAnsweredQuestionsNumbers[playersSockets[j]]);
+        alreadyAnsweredQuestionsNumbers[playersSockets[j]].push(sentQuestionNumber-1);
       }
-        time = time + timeForQuestion;
+      time = time + timeForQuestion;
     //after all questions end the Game
     endGame(gameId, timeForQuestion*numberOfQuestions);
-    }
-  } 
+  }
+} 
 
 
-function emitQuestion(playerSocket){
+function emitQuestion(playerSocket, alreadySent){
   console.log("debug");
-  var questionData = getQuestionData(playerSocket);
+  var questionData = getQuestionData(playerSocket, alreadySent);
   console.log("Question sent!");
     io.to(playerSocket).emit('newQuestionData', questionData);  //sending question 
+    return questionData.questionNumber;
   }
 
 /**
- * TODO : randomization of question(uniquness!), user can define number of answers
+ * TODO : randomization of question(uniqueness!), user can define number of answers
  */
- function getQuestionData(playerSocket){  
+ function getQuestionData(playerSocket, alreadySent){  
 
 // Randomize the order of the available words.
     // The first element in the randomized array will be displayed on the host screen.
     // The second element will be hidden in a list of decoys as the correct answer
 
     // Pick a random answer 
-    var rnd1 = getRandomInt(0, sampleQuestions.length-1);
+
+    var helperArray = [];
+    for (var i = 0; i < sampleQuestions.length; i++) {
+     helperArray[i] = i;
+    }
+
+    for (i = 0; i < alreadySent.length; i++) {
+      helperArray.splice( alreadySent[i], 1);
+    }
+
+
+
+    var num = Math.floor(Math.random() * helperArray.length); // pick a random number between 0 and the array length
+    var rnd1 = helperArray[num];
+
+    console.log("rnd1 is " + rnd1);
+
+
+
+
     var correctAnswers = shuffle(sampleQuestions[rnd1].answers);
     correctAnswers = correctAnswers[0];
 
