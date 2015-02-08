@@ -121,7 +121,7 @@ function hostStartGame(playersSockets, gameId){   // logic that randomize questi
    ************************* */
 
 
-
+   var alreadyAnsweredQuestionsNumbers ={};
 
   //send a question to player
   function sendQuestion(playersSockets, gameId){ //TODO Add arguments to function: numberOFQuestion and uniqess of questions
@@ -129,41 +129,39 @@ function hostStartGame(playersSockets, gameId){   // logic that randomize questi
     var numberOfQuestions = 4;
     var timeForQuestion = 8000; 
     var time = 0;
-  // var alreadyAnsweredQuestionsNumbers ={};
-   // var sentQuestionNumber = 0;
 
-    //Initializing alreadyAnsweredQuestionsNumber as array in player socketId object
-   // for(var i = 0; i < playersSockets.length; i++){   
-  //  alreadyAnsweredQuestionsNumbers[playersSockets[i]]=[];
-  //  }
+   // Initializing alreadyAnsweredQuestionsNumber as array in player socketId object
+   for(var i = 0; i < playersSockets.length; i++){   
+      alreadyAnsweredQuestionsNumbers[playersSockets[i]]=[];
+    for(var j = 0; j <numberOfQuestions; j++){
+      alreadyAnsweredQuestionsNumbers[playersSockets[i]][j]=j;
+    }
+  }
 
 
-    for(var i = 0; i < numberOfQuestions; i++){
+  for(var i = 0; i < numberOfQuestions; i++){
 
-      for(var j = 0; j < playersSockets.length; j++){
-        setTimeout(sentQuestionNumber = emitQuestion, time, playersSockets[j], alreadyAnsweredQuestionsNumbers[playersSockets[j]]);
-      //  console.log("Already sent iss: " + alreadyAnsweredQuestionsNumbers[playersSockets[j]]);
-      //  alreadyAnsweredQuestionsNumbers[playersSockets[j]].push(sentQuestionNumber-1);
-      }
-      time = time + timeForQuestion;
+    for(var j = 0; j < playersSockets.length; j++){
+      setTimeout(emitQuestion, time, playersSockets[j]);
+    }
+    time = time + timeForQuestion;
     //after all questions end the Game
   }
-    endGame(gameId, timeForQuestion*numberOfQuestions);
+  endGame(gameId, timeForQuestion*numberOfQuestions);
 } 
 
 
-function emitQuestion(playerSocket, alreadySent){
+function emitQuestion(playerSocket){
   console.log("debug");
-  var questionData = getQuestionData(playerSocket, alreadySent);
+  var questionData = getQuestionData(playerSocket);
   console.log("Question sent!");
     io.to(playerSocket).emit('newQuestionData', questionData);  //sending question 
-    return questionData.questionNumber;
   }
 
 /**
  * TODO : randomization of question(uniqueness!), user can define number of answers
  */
- function getQuestionData(playerSocket, alreadySent){  
+ function getQuestionData(playerSocket){  
 
 // Randomize the order of the available words.
     // The first element in the randomized array will be displayed on the host screen.
@@ -171,20 +169,12 @@ function emitQuestion(playerSocket, alreadySent){
 
     // Pick a random answer 
 
-    var helperArray = [];
-    for (var i = 0; i < sampleQuestions.length; i++) {
-     helperArray[i] = i;
-    }
+    var playerQuestionArray = alreadyAnsweredQuestionsNumbers[playerSocket];
 
-    for (i = 0; i < alreadySent.length; i++) {
-      helperArray.splice( alreadySent[i], 1);
-    }
+    var num = Math.floor(Math.random() * playerQuestionArray.length);
 
-
-
-    var num = Math.floor(Math.random() * helperArray.length); // pick a random number between 0 and the array length
-    var rnd1 = helperArray[num];
-
+    var rnd1 = parseInt(playerQuestionArray.splice(num, 1));
+    
     console.log("rnd1 is " + rnd1);
 
 
@@ -204,7 +194,7 @@ function emitQuestion(playerSocket, alreadySent){
     var questionData = {
       questionNumber: rnd1+1,
       question: sampleQuestions[rnd1].question,
-        answers: answers, // Correct Answer
+      answers: answers, // Correct Answer
       };
 
       console.log(questionData);
