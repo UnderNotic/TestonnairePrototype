@@ -69,7 +69,7 @@ jQuery(function($){
          * @param data
          */
          onNewQuestionData : function(data) {
-            // Update the current round
+            // Update the current question
             App.Player.currentQuestion = data.questionNumber;
 
             // Change the question for the Player
@@ -328,11 +328,14 @@ jQuery(function($){
             },
 
 
-             endGame : function(data) {
+             endGame : function() {
 
                 // Reset game data
                 App.Host.numPlayersInRoom = 0;
                 App.Host.isNewGame = true;
+                $result = $("</div>");
+                $result.addClass("info").text(data.question);
+                 $('#gameArea').html($result);
             }
         },
 

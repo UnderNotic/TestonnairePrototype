@@ -34,13 +34,18 @@ var gameSocket;
    *       HOST FUNCTIONS        *
    *                             *
    ******************************* */
-
+var players = {};
 /**
  * The 'START' button was clicked and 'hostCreateNewGame' event occurred.
  */
  function hostCreateNewGame() {
     // Create a unique Socket.IO Room
+    do{
     var thisGameId = ( Math.random() * 100000 ) | 0; //  | 0 means rounding down a number
+    }while(players[thisGameId] != undefined);  //make sure that this room doesnt exist
+
+
+    players[thisGameId]={}; //init object that will store player answers in room
 
     // Return the Room ID (gameId) and the socket ID (mySocketId) to the browser client
     this.emit('newGameCreated', {gameId: thisGameId, mySocketId: this.id});
@@ -52,7 +57,7 @@ var gameSocket;
 function hostStartGame(playersSockets, gameId){   // logic that randomize questions, send given number of unique questions 
   console.log("Test started!");
   console.log(playersSockets);
-  sendQuestion(playersSockets, gameId);  //send a question to a player
+  sendQuestions(playersSockets, gameId);  //send a question to a player
 }    
 
 
@@ -70,6 +75,8 @@ function hostStartGame(playersSockets, gameId){   // logic that randomize questi
  * @param data Contains data entered via player's input - playerName and gameId.
  */
 
+
+
  function playerJoinGame(data) {
   console.log('Player ' + data.playerName + 'attempting to join game: ' + data.gameId );
 
@@ -79,8 +86,14 @@ function hostStartGame(playersSockets, gameId){   // logic that randomize questi
     // Look up the room ID in the Socket.IO manager object.
     var room = gameSocket.adapter.rooms[data.gameId];
 
+    console.log("players in " + players);
+
     // If the room exists...
     if( room != undefined ){
+      //If player with the same name in the room doesn't exist
+      if(players[data.gameId][data.playerName]==undefined){
+        players[data.gameId][data.playerName] = [];
+
         // attach the socket id to the data object.
         data.mySocketId = sock.id;
 
@@ -93,15 +106,23 @@ function hostStartGame(playersSockets, gameId){   // logic that randomize questi
         io.sockets.in(data.gameId).emit('playerJoinedRoom', data);
 
       } else {
+          this.emit('errors',{message: "Choose diffrent name!"} );
+      }
+
+    } else {
         // Otherwise, send an error message back to the player.
         this.emit('errors',{message: "This room does not exist."} );
-      }
+     }
+
     }
+    
 
 /**
  * A player has tapped a word in the word list.
  * @param data gameId
  */
+
+
  function playerAnswer(data) {
   console.log('Player: ' + data.playerName + ' answered a question number :' + data.currentQuestion + ' with: ' + data.answer);
 
@@ -109,9 +130,13 @@ function hostStartGame(playersSockets, gameId){   // logic that randomize questi
     // Emit an event with the answer so it can be checked by the 'Host'
     // Or check on server-side with mongodb and send to host if answer was correct
 
+    players[data.gameId][data.playerName][data.currentQuestion]=data.answer;
+    console.log("Players in playerAnswer" + players[data.gameId][data.playerName]);
+
+
+
     io.sockets.in(data.gameId).emit('hostStoreAnswer', data);
   }
-
 
 
 /* *************************
@@ -121,10 +146,10 @@ function hostStartGame(playersSockets, gameId){   // logic that randomize questi
    ************************* */
 
 
-   var alreadyAnsweredQuestionsNumbers ={};
-
+   var alreadyAnsweredQuestionsNumbers ={}; //holds info about socketid's of players and question answered
+                                            //maybe join this with players object ?
   //send a question to player
-  function sendQuestion(playersSockets, gameId){ //TODO Add arguments to function: numberOFQuestion and uniqess of questions
+  function sendQuestions(playersSockets, gameId){
 
     var numberOfQuestions = 4;
     var timeForQuestion = 8000; 
@@ -132,7 +157,7 @@ function hostStartGame(playersSockets, gameId){   // logic that randomize questi
 
    // Initializing alreadyAnsweredQuestionsNumber as array in player socketId object
    for(var i = 0; i < playersSockets.length; i++){   
-      alreadyAnsweredQuestionsNumbers[playersSockets[i]]=[];
+    alreadyAnsweredQuestionsNumbers[playersSockets[i]]=[];
     for(var j = 0; j <numberOfQuestions; j++){
       alreadyAnsweredQuestionsNumbers[playersSockets[i]][j]=j;
     }
@@ -195,23 +220,30 @@ function emitQuestion(playerSocket){
       questionNumber: rnd1+1,
       question: sampleQuestions[rnd1].question,
       answers: answers, // Correct Answer
-      };
+    };
 
-      console.log(questionData);
+    console.log(questionData);
 
-      return questionData;
-    }
+    return questionData;
+  }
 
 
 function endGame(gameId, wait){ //TODO TEST IN MONGODB AND CHECKING ON SERVER SIDE
 
   console.log("Ending game");
+
+
+
+
+
   setTimeout(function(){
     io.sockets.in(gameId).emit('endGame');
   },wait);
 
 
 
+
+  players[gameId] = undefined; //decontructor
 }
 
 
