@@ -86,7 +86,6 @@ function hostStartGame(playersSockets, gameId){   // logic that randomize questi
     // Look up the room ID in the Socket.IO manager object.
     var room = gameSocket.adapter.rooms[data.gameId];
 
-    console.log("players in " + players);
 
     // If the room exists...
     if( room != undefined ){
@@ -131,10 +130,6 @@ function hostStartGame(playersSockets, gameId){   // logic that randomize questi
     // Or check on server-side with mongodb and send to host if answer was correct
 
     players[data.gameId][data.playerName][data.currentQuestion]=data.answer;
-    console.log("Players in playerAnswer" + players[data.gameId][data.playerName]);
-
-
-
     io.sockets.in(data.gameId).emit('hostStoreAnswer', data);
   }
 
@@ -172,7 +167,9 @@ function hostStartGame(playersSockets, gameId){   // logic that randomize questi
     time = time + timeForQuestion;
     //after all questions end the Game
   }
-  endGame(gameId, timeForQuestion*numberOfQuestions);
+
+  setTimeout(endGame, timeForQuestion*numberOfQuestions,gameId);
+
 } 
 
 
@@ -228,22 +225,53 @@ function emitQuestion(playerSocket){
   }
 
 
-function endGame(gameId, wait){ //TODO TEST IN MONGODB AND CHECKING ON SERVER SIDE
-
-  console.log("Ending game");
+function endGame(gameId){ //TODO TEST IN MONGODB AND CHECKING ON SERVER SIDE
 
 
+  //plyers[data.gameId][data.playerName][data.currentQuestion]=data.answer;
+
+    console.log("End Game");
+
+    var result = checkAnswers(gameId);
+
+    io.sockets.in(gameId).emit('endGame', result);
+
+    players[gameId] = undefined; //decostructor
 
 
 
-  setTimeout(function(){
-    io.sockets.in(gameId).emit('endGame');
-  },wait);
+}
+
+function checkAnswers(gameId){
+
+  var result = {};
+
+
+ //players[data.gameId][data.playerName][data.currentQuestion]=data.answer;
+
+
+ for(var player in players[gameId]){
+     result[player] = {};
+     result[player]["correctCount"] = 0;
+     result[player]["inCorrectCount"] = 0;
+
+
+  for(var i=0; i<players[gameId][player].length-1; i++){ // [0] is always empty
+
+    if(players[gameId][player][i+1]==sampleQuestions[i].answers[0]){
+      result[player]["correctCount"]++;
+    }
+    else{
+      result[player]["inCorrectCount"]++;
+    }
+  }
+ }
+
+
+return result;
 
 
 
-
-  players[gameId] = undefined; //decontructor
 }
 
 

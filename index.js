@@ -31,9 +31,6 @@ var server = app.listen(app.get('port'), function(){
 var io = require('socket.io').listen(server);
 
 
-// Reduce the logging output of Socket.IO
-io.set('log level',1);
-
 // Listen for Socket.IO Connections. Once connected, start the game logic.
 io.sockets.on('connection', function (socket) {
     console.log('client connected to node-server');

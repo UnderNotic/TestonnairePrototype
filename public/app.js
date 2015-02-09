@@ -5,7 +5,6 @@ jQuery(function($){
     /**
      * All the code relevant to Socket.IO is collected in the IO namespace.
      *
-     * @type {{init: Function, bindEvents: Function, onConnected: Function, onNewGameCreated: Function, playerJoinedRoom: Function, beginNewGae: Function, onNewWordData: Function, hostCheckAnswer: Function, gameOver: Function, error: Function}}
      */
      var IO = {
         /**
@@ -90,8 +89,8 @@ jQuery(function($){
          * Let everyone know the game has ended.
          * @param data
          */
-        endGame : function() {   //TODO implement this in game.js
-            App[App.myRole].endGame();
+        endGame : function(data) {   //TODO implement this in game.js
+            App[App.myRole].endGame(data);
         },
 
         /**
@@ -328,14 +327,32 @@ jQuery(function($){
             },
 
 
-             endGame : function() {
+             endGame : function(data) {
 
                 // Reset game data
                 App.Host.numPlayersInRoom = 0;
                 App.Host.isNewGame = true;
-                $result = $("</div>");
-                $result.addClass("info").text(data.question);
-                 $('#gameArea').html($result);
+
+                var $results = $('<ul/>');
+
+                // Insert a answers item for each word in the word answers
+                // received from the server.
+              console.log(data);
+
+                for(var player in data){
+                    console.log(player);
+
+                    $results                               
+                        .append( $('<li/>')             
+                                .html(player)                               
+                        .append( $('<li/>')             
+                                .html(" correct answers: " + data[player]["correctCount"])                             
+                        .append( $('<li/>')             
+                                .html(" incorrect answers:" + data[player]["inCorrectCount"])           
+                                )));
+                }
+                
+                 $('#gameArea').html($results);
             }
         },
 
@@ -460,7 +477,7 @@ jQuery(function($){
             /**
              * Show the "Game Over" screen.
              */
-             endGame : function() {
+             endGame : function(data) {
                 $('#gameArea')
                 .html('<div class="gameOver">Game Over!</div>');
             }
