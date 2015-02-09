@@ -2,13 +2,13 @@
 
  Dark Green : #78BD4C
   Mid Green : #A8FF56
-       Lite : #ECFFE0
+       Lite : #8AD453
 Dark Purple : #A22FB0
 
 */
 
 html, body {
-    background-color: #78BD4C;
+    background-color: #5800C4;
     height: 100%;
     width: 100%;
     margin: 0;
@@ -33,7 +33,7 @@ html, body {
     font-size: 2em;
     line-height: 1.2;
     text-align: center;
-    background-color: #8AD453;
+    background-color: #3DA617;
     white-space: nowrap;
     vertical-align: middle;
     cursor: pointer;
@@ -137,7 +137,7 @@ html, body {
 }
 
 .createGameWrapper{
-    color: #AE37B2;
+    color: #3DA617;
     font-weight: 300;
 }
 

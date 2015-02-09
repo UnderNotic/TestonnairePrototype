@@ -242,7 +242,7 @@ function endGame(gameId){ //TODO TEST IN MONGODB AND CHECKING ON SERVER SIDE
 
 }
 
-function checkAnswers(gameId){
+function checkAnswers(gameId){ //Answer function, for correct answer coorectCount++ if incorrect naswer inCorrectCount++ if no answer nothing happens
 
   var result = {};
 
@@ -329,14 +329,14 @@ return result;
       answers : ["ME"]
     },
     {
-      question  : "Tell me your story?" ,
-      decoys : [ "secret story", "drama", "island" ],
-      answers : ["Gatsby is great"]
+      question  : "Number π is equal to?" ,
+      decoys : [ "5", "8", "1" ],
+      answers : ["3.14"]
     },
     {
-      question  : "Your mother name?" ,
-      decoys : [ "Alla", "Mana", "Mulka" ],
-      answers : ["Elli"]
+      question  : "Which of the following is used in pencils?" ,
+      decoys : [ "Charcoal", "Silicon", "Phosphorous" ],
+      answers : ["Graphite"]
     }
 
 
