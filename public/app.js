@@ -348,7 +348,6 @@ jQuery(function($){
                 
                 //data.mySocketId
 
-
                 // Update host screen
                 $('#playersWaiting')
                 .append('<p/>')

@@ -149,7 +149,7 @@ function hostStartGame(playersSockets, gameId){   // logic that randomize questi
   //send a question to player
   function sendQuestions(playersSockets, gameId){
 
-    var numberOfQuestions = 4;
+    var numberOfQuestions = 2; // TODO
     var timeForQuestion = 8000; 
     var time = 0;
 
@@ -165,7 +165,7 @@ function hostStartGame(playersSockets, gameId){   // logic that randomize questi
   for(var i = 0; i < numberOfQuestions; i++){
 
     for(var j = 0; j < playersSockets.length; j++){
-      setTimeout(emitQuestion, time, playersSockets[j]);
+      setTimeout(emitQuestion, time, playersSockets[j], gameId);
     }
     time = time + timeForQuestion;
     //after all questions end the Game
@@ -176,9 +176,9 @@ function hostStartGame(playersSockets, gameId){   // logic that randomize questi
 } 
 
 
-function emitQuestion(playerSocket){
+function emitQuestion(playerSocket, gameId){
   console.log("debug");
-  var questionData = getQuestionData(playerSocket);
+  var questionData = getQuestionData(playerSocket, gameId);
   console.log("Question sent!");
     io.to(playerSocket).emit('newQuestionData', questionData);  //sending question 
   }
@@ -186,7 +186,7 @@ function emitQuestion(playerSocket){
 /**
  * TODO : randomization of question(uniqueness!), user can define number of answers
  */
- function getQuestionData(playerSocket){  
+ function getQuestionData(playerSocket, gameId){  
 
 // Randomize the order of the available words.
     // The first element in the randomized array will be displayed on the host screen.
@@ -205,11 +205,11 @@ function emitQuestion(playerSocket){
 
 
 
-    var correctAnswers = shuffle(sampleQuestions[rnd1].answers);
+    var correctAnswers = shuffle(questions[gameId][rnd1].answers);
     correctAnswers = correctAnswers[0];
 
     // Randomize the order of the decoy words and choose the first 3
-    var decoys = shuffle(sampleQuestions[rnd1].decoys).slice(0,3);
+    var decoys = shuffle(questions[gameId][rnd1].decoys).slice(0,3);
     // Pick a random spot in the decoy list to put the correct answer
     var rnd2 = getRandomInt(0,3); //correct
     decoys.splice(rnd2, 0, correctAnswers);   // TODO dynamic number of answers not only one
@@ -218,7 +218,7 @@ function emitQuestion(playerSocket){
     // Package the words into a single object.
     var questionData = {
       questionNumber: rnd1+1,
-      question: sampleQuestions[rnd1].question,
+      question: questions[gameId][rnd1].question,
       answers: answers, // Correct Answer
     };
 
@@ -260,7 +260,7 @@ function checkAnswers(gameId){ //Answer function, for correct answer coorectCoun
 
   for(var i=0; i<players[gameId][player].length-1; i++){ // [0] is always empty
 
-    if(players[gameId][player][i+1]==sampleQuestions[i].answers[0]){
+    if(players[gameId][player][i+1]==questions[gameId][i].answers[0]){
       result[player]["correctCount"]++;
     }
     else{
@@ -280,8 +280,8 @@ return result;
 
 
 
-                /* **************************
-                         UTILITY CODE
+                         /* **************************
+                                  UTILITY CODE
                          ************************** */
 
                          function getRandomInt(min, max) {
@@ -318,4 +318,3 @@ return result;
 
 
 
-    var sampleQuestions = [];
