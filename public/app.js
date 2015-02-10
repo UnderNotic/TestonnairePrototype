@@ -35,7 +35,7 @@ jQuery(function($){
          */
          onConnected : function(data) {
              // Cache a copy of the client's socket.IO session ID on the App
-            App.mySocketId = IO.socket.io.engine.id;
+             App.mySocketId = IO.socket.io.engine.id;
             //console.log("Hello!");
             console.log(data.message);
         },
@@ -112,7 +112,7 @@ jQuery(function($){
          gameId: 0,
 
 
-        mySocketId: 0,
+         mySocketId: 0,
 
          /**
          * This is used to differentiate between 'Host' and 'Player' browsers.
@@ -148,6 +148,7 @@ jQuery(function($){
 
             // Templates
             App.$gameArea = $('#gameArea');
+            App.$templateGenerateTest = $('#generate-test-template').html();
             App.$templateIntroScreen = $('#intro-screen-template').html();
             App.$templateNewGame = $('#create-game-template').html();
             App.$templateJoinGame = $('#join-game-template').html();
@@ -159,6 +160,7 @@ jQuery(function($){
          */
          bindEvents: function () {
             // Host
+            App.$doc.on('click', '#btnGenTest', App.Host.onGenerateClick);
             App.$doc.on('click', '#btnCreateGame', App.Host.onCreateClick);
             App.$doc.on('click', '#btnStartGame', App.Host.onStartClick);
             // Player
@@ -195,6 +197,8 @@ jQuery(function($){
              /*Constains players sockedId*/
              playersSocketId: [],
 
+
+            questions: [], //constains generated questions
             /**
              * Keep track of the number of players that have joined the game.
              */
@@ -206,24 +210,104 @@ jQuery(function($){
              currentCorrectAnswer: '',
 
 
+
+             onGenerateClick: function () {
+                App.$gameArea.html(App.$templateGenerateTest);
+           
+                    var $question = $("<div/>").append(
+                    $("<input/>", {
+                        type: 'text',
+                        id: 'question1',
+                        name: 'question',
+                        placeholder: 'question',
+                        width: '90%',
+                    }).css({"color": "red", "font-weight": "400"}),
+
+                    $("<br>"),
+                    $("<br>"),
+                    $("<input/>", {
+                        type: 'text',
+                        id: 'answer1',
+                        name: 'answer',
+                        placeholder: 'correct answer',
+                        width: '80%'
+                    }).css({"color": "#3DA617", "font-weight": "500"}),
+                    $("<br>"),
+                    $("<input/>", {
+                        type: 'text',
+                        id: 'decoy1',
+                        name: 'answer',
+                        placeholder: 'decoy',
+                        width: '80%',
+                        margin: '54px'
+                    }),
+                     $("<br>"),
+                    $("<input/>", {
+                        type: 'text',
+                        id: 'decoy2',
+                        name: 'answer',
+                        placeholder: 'decoy',
+                        width: '80%'
+                    }),
+                     $("<br>"),
+                    $("<input/>", {
+                        type: 'text',
+                        id: 'decoy3',
+                        name: 'answer',
+                        placeholder: 'decoy',
+                        width: '80%'
+                    }),
+                     $("<br>")     
+                    );
+
+
+                $('#questions').append($question);
+                   
+                  
+
+
+
+
+                
+                var question;
+                    $("#btnCreateQuestion").click(function(){
+                            question = {
+                                question  : $("#question1").val() ,
+                                decoys : [$("#decoy1").val(), $("#decoy2").val(), $("#decoy3").val()],
+                                answers : [$("#answer1").val()]
+                            };
+
+                            App.Host.questions.push(question);
+                            $("input[type=text], textarea").val(""); // clear Screen
+
+                    });
+
+
+
+
+
+
+            },
+
+
              /**
              * Handler for the "Start" button on the Title Screen.
              */
              onCreateClick: function () {
                 // console.log('Clicked "Create A Game"');
-                IO.socket.emit('hostCreateNewGame');
+                IO.socket.emit('hostCreateNewGame', App.Host.questions);
             },
 
-             onStartClick: function(){
+            onStartClick: function(){
                 if(App.Host.numPlayersInRoom===0)
                 {
                     alert("You can NOT start the game without players");
                 }
                 else{
-                console.log("Game started!");
+                    console.log("Game started!");
                 App[App.myRole].gameCountdown();   // starting game countdown!
             }
-            },
+        },
 
             /**
              * The Host screen is displayed for the first time.
@@ -270,7 +354,7 @@ jQuery(function($){
                 .append('<p/>')
                 .text('Player ' + data.playerName + ' joined!');
 
-              $('#lobby > tbody:last').append('<tr><td>'+App.Host.numPlayersInRoom+'</td><td>'+data.playerName+'</td></tr>');
+                $('#lobby > tbody:last').append('<tr><td>'+App.Host.numPlayersInRoom+'</td><td>'+data.playerName+'</td></tr>');
 
                 //Init tab with player answers and questions
                 App.Host.players[data.playerName] = [];
@@ -292,8 +376,9 @@ jQuery(function($){
 
                 // Begin the on-screen countdown timer
                 var $secondsLeft = $('#hostWord');
-                  App.countDown( $secondsLeft, 5, function(){
-                    IO.socket.emit('hostCountdownFinished', App.Host.playersSocketId, App.gameId);
+                App.countDown( $secondsLeft, 5, function(){
+                    IO.socket.emit('hostCountdownFinished', App.Host.playersSocketId, App.gameId, App.Host.questions);
+                    $secondsLeft.text('Game Started!');
                 });
 
             },
@@ -312,7 +397,7 @@ jQuery(function($){
              * Check the answer clicked by a player.
              * @param data{{round: *, playerId: *, answer: *, gameId: *}}
              */
-            storeAnswer : function(data) {
+             storeAnswer : function(data) {
 
                 var currentQuestion = data.currentQuestion;
                 var answer = data.answer;
@@ -327,7 +412,7 @@ jQuery(function($){
             },
 
 
-             endGame : function(data) {
+            endGame : function(data) {
 
                 // Reset game data
                 App.Host.numPlayersInRoom = 0;
@@ -337,22 +422,22 @@ jQuery(function($){
 
                 // Insert a answers item for each word in the word answers
                 // received from the server.
-              console.log(data);
+                console.log(data);
 
                 for(var player in data){
                     console.log(player);
 
                     $results                               
+                    .append( $('<li/>')             
+                        .html(player)                               
                         .append( $('<li/>')             
-                                .html(player)                               
-                        .append( $('<li/>')             
-                                .html(" correct answers: " + data[player]["correctCount"])                             
-                        .append( $('<li/>')             
+                            .html(" correct answers: " + data[player]["correctCount"])                             
+                            .append( $('<li/>')             
                                 .html(" incorrect answers:" + data[player]["inCorrectCount"])           
                                 )));
                 }
                 
-                 $('#gameArea').html($results);
+                $('#gameArea').html($results);
             }
         },
 
@@ -440,7 +525,7 @@ jQuery(function($){
             gameCountdown : function(){
 
                 $('#gameArea')
-                    .html('<div class="gameOver">Get Ready!</div>');
+                .html('<div class="gameOver">Get Ready!</div>');
 
 
             },
@@ -448,7 +533,7 @@ jQuery(function($){
             newQuestion : function(data) {
                 var $question = $('<div/>');
               //  $question.addClass('info').html(data.question);
-                $question.addClass("info").text(data.question);
+              $question.addClass("info").text(data.question);
 
                 // Create an unordered list element
                 var $answers = $('<ul/>').attr('id','ulAnswers');

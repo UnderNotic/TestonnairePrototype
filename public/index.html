@@ -29,13 +29,30 @@
 
             <div class="buttons">
 
-                <button id="btnCreateGame" class="btn left">CREATE</button>
+                <button id="btnGenTest" class="btn left">CREATE</button>
                 <button id="btnJoinGame" class="btn right">JOIN</button>
                 <div style="clear:both"></div>
             </div>
 
         </div>
 
+    </script>
+
+    <!-- TOOOOOODDDDOOOOO This screen appears when a user clicks "CREATE" on the Title Screen -->
+    <script id="generate-test-template" type="text/template">
+        <div class="createGameWrapper">
+
+            <div class="info">Generate your test!</div>
+            <form id="questions" class="genQuestions"></form>
+           
+                <br><br>
+
+            <button id="btnCreateQuestion" class="btn" class="btn">Add Question!</button>
+            <button id="btnCreateGame" class="btn" class="btn btn-default">Create Game!</button>
+
+
+
+        </div>
     </script>
 
     <!-- This screen appears when a user clicks "CREATE" on the Title Screen -->
@@ -49,21 +66,9 @@
             <div id="spanNewGameCode" class="gameId">Error!</div>
 
             <div id="playersWaiting"></div>
-            <table id="lobby" class="table table-bordered table-condensed table-hover">
-                <thead>
-                    <tr>
-                        <th>Lobby</th>
-                    </tr>
-                    <tr>
-                    <td>#</td> <td>Name</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td></td>
-                    </tr>
-                </tbody>
-            </table>
+          
+
+
             <button id="btnStartGame" type="button" class="btn btn-default">Start!</button>
 
 
