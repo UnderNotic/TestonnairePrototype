@@ -353,8 +353,6 @@ jQuery(function($){
                 .append('<p/>')
                 .text('Player ' + data.playerName + ' joined!');
 
-                $('#lobby > tbody:last').append('<tr><td>'+App.Host.numPlayersInRoom+'</td><td>'+data.playerName+'</td></tr>');
-
                 //Init tab with player answers and questions
                 App.Host.players[data.playerName] = [];
                 App.Host.players[data.playerName][0] = data.mySocketId; //maybe some kind of authentication security method?
