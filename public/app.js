@@ -271,6 +271,10 @@ jQuery(function($){
                 
                 var question;
                     $("#btnCreateQuestion").click(function(){
+                        if($.trim($('#question1').val()) == '' || $.trim($('#decoy1').val()) == '' || $.trim($('#decoy2').val()) == '' || $.trim($('#decoy3').val()) == '' || $.trim($('#answer1').val()) == ''){
+                            alert("You must fill all inputs!");
+                        }
+                        else{
                             question = {
                                 question  : $("#question1").val() ,
                                 decoys : [$("#decoy1").val(), $("#decoy2").val(), $("#decoy3").val()],
@@ -280,6 +284,13 @@ jQuery(function($){
                             App.Host.questions.push(question);
                             $("input[type=text], textarea").val(""); // clear Screen
 
+                        var num = App.Host.questions.length;
+                    $("#numOfQuestions").append($('<option>', {
+                        value: num,
+                        text: num
+                    }));
+
+                        }
                     });
 
 
@@ -295,7 +306,12 @@ jQuery(function($){
              */
              onCreateClick: function () {
                 // console.log('Clicked "Create A Game"');
-                IO.socket.emit('hostCreateNewGame', App.Host.questions);
+
+               var timeForQuestion = $( "timeForQuestion" ).val();
+               var numOfQuestions = $( "numOfQuestions" ).val();
+
+
+                IO.socket.emit('hostCreateNewGame', App.Host.questions, timeForQuestion, numOfQuestions);
             },
 
             onStartClick: function(){

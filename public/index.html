@@ -8,123 +8,140 @@
 
     <!-- Let's borrow a cool looking Font from Google -->
     <link href='https://fonts.googleapis.com/css?family=Quicksand:300,400,700' rel='stylesheet' type='text/css'>
-   <!--  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet"> -->
+    <!--  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet"> -->
     <link href="css/styles.css" rel="stylesheet">
 </head>
 
 <body>
 
- <div id="gameArea">
-        <!-- This is where the templates defined below will be used -->
+   <div id="gameArea">
+    <!-- This is where the templates defined below will be used -->
+</div>
+
+<!-- Main Title Screen that appears when the page loads for the first time -->
+<script id="intro-screen-template" type="text/template">
+
+    <div class="titleWrapper">
+
+        <div class="title">
+            TESTONNAIRE
+        </div>
+
+        <div class="buttons">
+
+            <button id="btnGenTest" class="btn left">CREATE</button>
+            <button id="btnJoinGame" class="btn right">JOIN</button>
+            <div style="clear:both"></div>
+        </div>
+
     </div>
 
-    <!-- Main Title Screen that appears when the page loads for the first time -->
-    <script id="intro-screen-template" type="text/template">
+</script>
 
-        <div class="titleWrapper">
+<!-- TOOOOOODDDDOOOOO This screen appears when a user clicks "CREATE" on the Title Screen -->
+<script id="generate-test-template" type="text/template">
+    <div class="createGameWrapper">
 
-            <div class="title">
-                TESTONNAIRE
-            </div>
+        <div class="info">Generate your test!</div>
+        <form id="questions" class="genQuestions"></form>
 
-            <div class="buttons">
+        <br><br>
 
-                <button id="btnGenTest" class="btn left">CREATE</button>
-                <button id="btnJoinGame" class="btn right">JOIN</button>
-                <div style="clear:both"></div>
-            </div>
+        <select id="timeForQuestion">
+            <option value="8" disabled="disabled" selected="selected">Please select time for a question</option>
+            <option value="6">6 seconds</option>
+            <option value="8">8 seconds</option>
+            <option value="10">10 seconds</option>
+            <option value="12">12 seconds</option>
+            <option value="14">14 seconds</option>
+        </select>
 
+           <select id="numOfQuestions">
+            <option value="1" disabled="disabled" selected="selected">Please select number of questions</option>
+            </select>
+
+        <br>
+        <br>
+        <button id="btnCreateQuestion" class="btn" class="btn">Add Question!</button>
+        <br>
+        <br>
+        <button id="btnCreateGame" class="btn" class="btn btn-default">Create Game!</button>
+
+
+
+    </div>
+</script>
+
+<!-- This screen appears when a user clicks "CREATE" on the Title Screen -->
+<script id="create-game-template" type="text/template">
+    <div class="createGameWrapper">
+
+        <div class="info">Open this site on your mobile device:</div>
+        <div id="gameURL" class="infoBig">Error!</div>
+
+        <div class="info">Then click <strong>JOIN</strong> and <br/> enter the following Game ID:</div>
+        <div id="spanNewGameCode" class="gameId">Error!</div>
+
+        <div id="playersWaiting"></div>
+
+        <br>
+        <button id="btnStartGame" type="button" class="btn btn-default">Start!</button>
+
+
+
+    </div>
+</script>
+
+<!-- This scrreen appears when a player clicks "JOIN" on the Title Screen -->
+<script id="join-game-template" type="text/template">
+    <div class="joinGameWrapper">
+        <div class="info">
+            <label for="inputPlayerName">Your Name:</label>
+            <input id="inputPlayerName" type="text" />
         </div>
 
-    </script>
-
-    <!-- TOOOOOODDDDOOOOO This screen appears when a user clicks "CREATE" on the Title Screen -->
-    <script id="generate-test-template" type="text/template">
-        <div class="createGameWrapper">
-
-            <div class="info">Generate your test!</div>
-            <form id="questions" class="genQuestions"></form>
-           
-                <br><br>
-
-            <button id="btnCreateQuestion" class="btn" class="btn">Add Question!</button>
-            <button id="btnCreateGame" class="btn" class="btn btn-default">Create Game!</button>
-
-
-
+        <div class="info">
+            <label for="inputGameId">Game ID:</label>
+            <input id="inputGameId" type="text"/>
         </div>
-    </script>
 
-    <!-- This screen appears when a user clicks "CREATE" on the Title Screen -->
-    <script id="create-game-template" type="text/template">
-        <div class="createGameWrapper">
-
-            <div class="info">Open this site on your mobile device:</div>
-            <div id="gameURL" class="infoBig">Error!</div>
-
-            <div class="info">Then click <strong>JOIN</strong> and <br/> enter the following Game ID:</div>
-            <div id="spanNewGameCode" class="gameId">Error!</div>
-
-            <div id="playersWaiting"></div>
-          
-            <br>
-            <button id="btnStartGame" type="button" class="btn btn-default">Start!</button>
-
-
-
+        <div class="info buttons">
+            <button id="btnJoinRoom" class="btn">Join Room!</button>
+            <div id="playerWaitingMessage"></div>
         </div>
-    </script>
-
-    <!-- This scrreen appears when a player clicks "JOIN" on the Title Screen -->
-    <script id="join-game-template" type="text/template">
-        <div class="joinGameWrapper">
-            <div class="info">
-                <label for="inputPlayerName">Your Name:</label>
-                <input id="inputPlayerName" type="text" />
-            </div>
-
-            <div class="info">
-                <label for="inputGameId">Game ID:</label>
-                <input id="inputGameId" type="text"/>
-            </div>
-
-            <div class="info buttons">
-                <button id="btnJoinRoom" class="btn">Join Room!</button>
-                <div id="playerWaitingMessage"></div>
-            </div>
-        </div>
-    </script>
+    </div>
+</script>
 
 
 
 
 
-    <!-- This is the 'Host' screen. It displays the countdown -->
-    <script id="host-game-template" type="text/template">
-        <div id="wordArea">
-            <div id="hostWord">5</div>
-        </div>
-    </script>
+<!-- This is the 'Host' screen. It displays the countdown -->
+<script id="host-game-template" type="text/template">
+    <div id="wordArea">
+        <div id="hostWord">5</div>
+    </div>
+</script>
 
- 
 
-    <!-- JavaScript Libraries -->
 
-    <!-- jQuery! -->
-    <script src="libs/jquery-2.1.3.js"></script>
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+<!-- JavaScript Libraries -->
+
+<!-- jQuery! -->
+<script src="libs/jquery-2.1.3.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 
     <!-- TextFit resizes text to fill a container.
         It's used so the titles and game words fit properly on any size screen.
         https://github.com/STRML/textFit   -->
-    <script src="libs/textFit.min.js"></script>
+        <script src="libs/textFit.min.js"></script>
 
     <!-- FastClick is used to eliminate the 300ms delay when clicking items on a mobile device
-        https://github.com/ftlabs/fastclick -->
+    https://github.com/ftlabs/fastclick -->
     <script src="libs/fastclick.js"></script>
 
     <!-- If Socket.IO is used with Express, then the /socket.io/ path will
-        serve the proper Socket.IO javascript files used by the browser -->
+    serve the proper Socket.IO javascript files used by the browser -->
     <script src="https://cdn.socket.io/socket.io-1.3.2.js"></script>
 
     <!-- app.js is where all the client-side Anagrammatix game logic -->
