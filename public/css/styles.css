@@ -54,7 +54,7 @@ html, body {
 .btn:hover,
 .btn:focus {
     text-decoration: none;
-    color:white;
+    color:#5800C4;
 }
 
 .btn:active,

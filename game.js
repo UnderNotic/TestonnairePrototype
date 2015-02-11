@@ -157,20 +157,20 @@ function hostStartGame(playersSockets, gameId){   // logic that randomize questi
   //send a question to player
   function sendQuestions(playersSockets, gameId){
 
-    var numberOfQuestions = options[gameId]["numOfQuestions"];
+    var numberOfQuestionsToSend = options[gameId]["numOfQuestions"];
     var timeForQuestion = options[gameId]["timeForQuestion"] * 1000;  
     var time = 0;
 
    // Initializing alreadyAnsweredQuestionsNumber as array in player socketId object
    for(var i = 0; i < playersSockets.length; i++){   
     alreadyAnsweredQuestionsNumbers[playersSockets[i]]=[];
-    for(var j = 0; j <numberOfQuestions; j++){
+    for(var j = 0; j <questions[gameId].length; j++){
       alreadyAnsweredQuestionsNumbers[playersSockets[i]][j]=j;
     }
   }
 
 
-  for(var i = 0; i < numberOfQuestions; i++){
+  for(var i = 0; i < numberOfQuestionsToSend; i++){
 
     for(var j = 0; j < playersSockets.length; j++){
       setTimeout(emitQuestion, time, playersSockets[j], gameId);
@@ -179,7 +179,7 @@ function hostStartGame(playersSockets, gameId){   // logic that randomize questi
     //after all questions end the Game
   }
 
-  setTimeout(endGame, timeForQuestion*numberOfQuestions,gameId);
+  setTimeout(endGame, timeForQuestion*numberOfQuestionsToSend,gameId);
 
 } 
 
