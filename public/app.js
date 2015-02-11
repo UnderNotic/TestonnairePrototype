@@ -307,9 +307,8 @@ jQuery(function($){
              onCreateClick: function () {
                 // console.log('Clicked "Create A Game"');
 
-               var timeForQuestion = $( "timeForQuestion" ).val();
-               var numOfQuestions = $( "numOfQuestions" ).val();
-
+               var timeForQuestion = $( "#timeForQuestion" ).val();
+               var numOfQuestions = $( "#numOfQuestions" ).val();
 
                 IO.socket.emit('hostCreateNewGame', App.Host.questions, timeForQuestion, numOfQuestions);
             },
