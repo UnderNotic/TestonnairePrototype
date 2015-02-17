@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
     <!-- Let's borrow a cool looking Font from Google -->
-    <link href='https://fonts.googleapis.com/css?family=Quicksand:300,400,700' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Rajdhani:300,400,700' rel='stylesheet' type='text/css'>
     <!--  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet"> -->
     <link href="css/styles.css" rel="stylesheet">
 </head>
@@ -24,13 +24,13 @@
     <div class="titleWrapper">
 
         <div class="title">
-            TESTONNAIRE
+            TEST
         </div>
 
         <div class="buttons">
 
-            <button id="btnGenTest" class="btn left">CREATE</button>
-            <button id="btnJoinGame" class="btn right">JOIN</button>
+            <button id="btnGenTest" class="btn left">STWÓRZ</button>
+            <button id="btnJoinGame" class="btn right">DOŁĄCZ</button>
             <div style="clear:both"></div>
         </div>
 
@@ -42,13 +42,13 @@
 <script id="generate-test-template" type="text/template">
     <div class="createGameWrapper">
 
-        <div class="info">Generate your test!</div>
+        <div class="info">Wygeneruj test!</div>
         <form id="questions" class="genQuestions"></form>
 
         <br><br>
 
         <select id="timeForQuestion">
-            <option value="8" disabled="disabled" selected="selected">Please select time for a question</option>
+            <option value="8" disabled="disabled" selected="selected">Wybierz czas odpowiedzi na pytanie</option>
             <option value="6">6 seconds</option>
             <option value="8">8 seconds</option>
             <option value="10">10 seconds</option>
@@ -57,15 +57,15 @@
         </select>
 
            <select id="numOfQuestions">
-            <option value="1" disabled="disabled" selected="selected">Please select number of questions to send</option>
+            <option value="1" disabled="disabled" selected="selected">Wybierz liczbe pytań do wysłania</option>
             </select>
 
         <br>
         <br>
-        <button id="btnCreateQuestion" class="btn" class="btn">Add Question!</button>
+        <button id="btnCreateQuestion" class="btn" class="btn">Dodaj pytanie!</button>
         <br>
         <br>
-        <button id="btnCreateGame" class="btn" class="btn btn-default">Create Game!</button>
+        <button id="btnCreateGame" class="btn" class="btn btn-default">STWÓRZ GRĘ!</button>
 
 
 
@@ -76,11 +76,11 @@
 <script id="create-game-template" type="text/template">
     <div class="createGameWrapper">
 
-        <div class="info">Open this site on your mobile device:</div>
-        <div id="gameURL" class="infoBig">Error!</div>
+        <div class="info">Otwórz tą strone na urządzeniu mobilnym:</div>
+        <div id="gameURL" class="infoBig">Błąd!</div>
 
-        <div class="info">Then click <strong>JOIN</strong> and <br/> enter the following Game ID:</div>
-        <div id="spanNewGameCode" class="gameId">Error!</div>
+        <div class="info">Następnie kliknij <strong>DOŁĄCZ</strong> i <br/> wpisz poniższy ID gry:</div>
+        <div id="spanNewGameCode" class="gameId">Błąd!</div>
 
         <div id="playersWaiting"></div>
 
@@ -96,17 +96,17 @@
 <script id="join-game-template" type="text/template">
     <div class="joinGameWrapper">
         <div class="info">
-            <label for="inputPlayerName">Your Name:</label>
+            <label for="inputPlayerName">Wpisz pseudonim:</label>
             <input id="inputPlayerName" type="text" />
         </div>
 
         <div class="info">
-            <label for="inputGameId">Game ID:</label>
+            <label for="inputGameId">ID gry:</label>
             <input id="inputGameId" type="text"/>
         </div>
 
         <div class="info buttons">
-            <button id="btnJoinRoom" class="btn">Join Room!</button>
+            <button id="btnJoinRoom" class="btn">DOŁĄCZ!</button>
             <div id="playerWaitingMessage"></div>
         </div>
     </div>

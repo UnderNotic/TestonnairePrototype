@@ -219,7 +219,7 @@ jQuery(function($){
                         type: 'text',
                         id: 'question1',
                         name: 'question',
-                        placeholder: 'question',
+                        placeholder: 'Wpisz pytanie',
                         width: '90%',
                     }).css({"color": "red", "font-weight": "400"}),
 
@@ -229,7 +229,7 @@ jQuery(function($){
                         type: 'text',
                         id: 'answer1',
                         name: 'answer',
-                        placeholder: 'correct answer',
+                        placeholder: 'prawidłowa odpowiedź',
                         width: '80%'
                     }).css({"color": "#3DA617", "font-weight": "500"}),
                     $("<br>"),
@@ -237,7 +237,7 @@ jQuery(function($){
                         type: 'text',
                         id: 'decoy1',
                         name: 'answer',
-                        placeholder: 'decoy',
+                        placeholder: 'błędna odpowiedź',
                         width: '80%',
                         margin: '54px'
                     }),
@@ -246,7 +246,7 @@ jQuery(function($){
                         type: 'text',
                         id: 'decoy2',
                         name: 'answer',
-                        placeholder: 'decoy',
+                        placeholder: 'błędna odpowiedź',
                         width: '80%'
                     }),
                      $("<br>"),
@@ -254,7 +254,7 @@ jQuery(function($){
                         type: 'text',
                         id: 'decoy3',
                         name: 'answer',
-                        placeholder: 'decoy',
+                        placeholder: 'błędna odpowiedź',
                         width: '80%'
                     }),
                      $("<br>")     
