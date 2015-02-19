@@ -366,7 +366,7 @@ jQuery(function($){
                 // Update host screen
                 $('#playersWaiting')
                 .append('<p/>')
-                .text('Player ' + data.playerName + ' joined!');
+                .text('Gracz ' + data.playerName + ' dołączył!');
 
                 //Init tab with player answers and questions
                 App.Host.players[data.playerName] = [];
@@ -529,7 +529,7 @@ jQuery(function($){
                     $('#btnJoinRoom').attr("disabled", true);
                     $('#playerWaitingMessage')
                     .append('<p/>')
-                    .text('Joined Game ' + data.gameId + '. Please wait for game to begin.');
+                    .text('Dołączono do gry ' + data.gameId + '. Czekaj na rozpoczęcie gry.');
                 }
             },
 
@@ -543,12 +543,12 @@ jQuery(function($){
             },
 
             newQuestion : function(data) {
-                var $question = $('<div/>');
-              //  $question.addClass('info').html(data.question);
-              $question.addClass("info").text(data.question);
 
                 // Create an unordered list element
                 var $answers = $('<ul/>').attr('id','ulAnswers');
+
+                $answers.append( $('<li/>').addClass('question') .html(data.question));
+
 
                 // Insert a answers item for each word in the word answers
                 // received from the server.
@@ -564,9 +564,8 @@ jQuery(function($){
                             );
                     });
 
-                $question.append($answers);
                 // Insert onto the screen.
-                $('#gameArea').html($question);
+                $('#gameArea').html($answers);
             },
 
 

@@ -73,6 +73,18 @@ html, body {
     float: right;
 }
 
+.question {
+    display: inline-block;
+    line-height: 50px;
+    color: #ECFFE0;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 400;
+    font-size: 2em;
+    text-align: center;
+}
+
+
+
 /* ******************************
           TITLE SCREEN
      (intro-screen-template)
